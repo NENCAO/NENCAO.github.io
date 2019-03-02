@@ -5,15 +5,26 @@
   
 
   
-  <title></title>
+  <title>最简单的一个DLL劫持(Hijack) | </title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta property="og:type" content="website">
-<meta property="og:title">
-<meta property="og:url" content="/index.html">
+  <meta name="description" content="一个比较有趣的技术 dll劫持技术  原理: 程序在加载的时候一定会调用dll文件,所以说如果我们可以伪造一个dll让系统调用,程序该干嘛干嘛 但是里面的一些东西实际上已经被我们改动过了.只要能执行我们自己的函数,那么我们的目的就已经达到了  dll的调用路径问题,windows的dll调用默认规则是在主程序目录下找需要的dll,如果当前目录下没有再去系统目录下找,还是没有再去环境变量中找.">
+<meta name="keywords" content="劫持">
+<meta property="og:type" content="article">
+<meta property="og:title" content="最简单的一个DLL劫持(Hijack)">
+<meta property="og:url" content="/2019/03/01/Dll劫持/index.html">
 <meta property="og:site_name">
+<meta property="og:description" content="一个比较有趣的技术 dll劫持技术  原理: 程序在加载的时候一定会调用dll文件,所以说如果我们可以伪造一个dll让系统调用,程序该干嘛干嘛 但是里面的一些东西实际上已经被我们改动过了.只要能执行我们自己的函数,那么我们的目的就已经达到了  dll的调用路径问题,windows的dll调用默认规则是在主程序目录下找需要的dll,如果当前目录下没有再去系统目录下找,还是没有再去环境变量中找.">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2954412-6953d643781b42b4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2954412-bf4ff8c330abe3e9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2954412-9dbfbce7cbe4463c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2954412-bd11b93de53f9fad.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/2954412-2a7551ed7d264044.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-03-01T13:37:51.034Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title">
+<meta name="twitter:title" content="最简单的一个DLL劫持(Hijack)">
+<meta name="twitter:description" content="一个比较有趣的技术 dll劫持技术  原理: 程序在加载的时候一定会调用dll文件,所以说如果我们可以伪造一个dll让系统调用,程序该干嘛干嘛 但是里面的一些东西实际上已经被我们改动过了.只要能执行我们自己的函数,那么我们的目的就已经达到了  dll的调用路径问题,windows的dll调用默认规则是在主程序目录下找需要的dll,如果当前目录下没有再去系统目录下找,还是没有再去环境变量中找.">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/2954412-6953d643781b42b4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
   
     <link rel="alternate" href="/atom.xml" title type="application/atom+xml">
   
@@ -56,78 +67,7 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-Qt编码" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/03/02/Qt编码/" class="article-date">
-  <time datetime="2019-03-02T03:52:04.405Z" itemprop="datePublished">2019-03-02</time>
-</a>
-    
-  <div class="article-category">
-    <a class="article-category-link" href="/categories/Qt/">Qt</a>
-  </div>
-
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/02/Qt编码/">QT 编码问题</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>###QT中的编码问题</p>
-<ul>
-<li>QT中中文支持其实还是可以的,只是初期没有掌握的时候会比较懵逼,网上又有些是QT4版本时期的解决方案,导致我刚开始在面对编码问题的时候头疼</li>
-</ul>
-<figure class="highlight qt"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ui-&gt;textBrowser-&gt;append(ui-&gt;lineEdit-&gt;text());</span><br><span class="line"></span><br><span class="line">qDebug() &lt;&lt; ui-&gt;lineEdit-&gt;text();</span><br><span class="line">qDebug() &lt;&lt; ui-&gt;lineEdit-&gt;text().toStdString().c_str();</span><br><span class="line">qDebug() &lt;&lt; ui-&gt;lineEdit-&gt;text().toUtf8().toStdString().c_str();</span><br><span class="line">qDebug() &lt;&lt; ui-&gt;lineEdit-&gt;text().toLocal8Bit().toStdString().c_str();</span><br><span class="line">qDebug() &lt;&lt; ui-&gt;lineEdit-&gt;text().toUtf8();</span><br><span class="line">qDebug() &lt;&lt; ui-&gt;lineEdit-&gt;text().toLocal8Bit();</span><br><span class="line">ui-&gt;lineEdit-&gt;clear();</span><br></pre></td></tr></table></figure>
-<ul>
-<li>简单的写一个程序,从lineEdit里直接拿字符串到textBrowser<br><img src="https://upload-images.jianshu.io/upload_images/2954412-104eb78f36c12171.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></li>
-</ul>
-<ol>
-<li>可以看到只有最后一个是乱码</li>
-<li>toUtf8 转换后是 UTF8编码格式的字符串 </li>
-<li>toLocal8Bit 转换后是ANSI编码格式的字符串</li>
-<li>在默认情况下控件能都是用的UTF8编码格式在显示</li>
-</ol>
-<hr>
-<p>##QT常量字符串乱码<br><img src="https://upload-images.jianshu.io/upload_images/2954412-b29c30220a72e722.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></p>
-<ul>
-<li>大概大家都能遇到这个问题,很是烦人</li>
-<li>原因上面已经分析出来了,很明显这个默认的常量字符串不是UTF8编码的需要转换成UTF8编码才能正常显示</li>
-<li><code>fromLocal8Bit</code> 表示原字符串格式是GBK/GB2312格式的字符串<br><code>ui-&gt;textBrowser-&gt;append(QString::fromLocal8Bit(&quot;有咸斋&quot;));</code></li>
-<li>常量转换成了UTF8放进textBrowser才正常显示<br><img src="https://upload-images.jianshu.io/upload_images/2954412-bf04acb714bbfa0a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image.png"></li>
-</ul>
-<ul>
-<li>那么对于winapi要使用字符串的地方也是同理,需要先做编码转换再进行传递,虽然有点烦,但是考虑到UTF8的广泛性,其实多写一点转换没有什么问题.万一来个多语言,用GBK不是死翘翘</li>
-</ul>
-<hr>
-<p>#####总结QString的功能其实挺不错的,包括各种转换都考虑到了,有时候是没有理解到其内部机制导致对编码问题不理解.其实耐心解决这个问题应该不是问题,毕竟人早就给你写好了,你去用就好了…</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="/2019/03/02/Qt编码/" data-id="cjsqybbhe0000z8ucbd9pe4yr" class="article-share-link">Share</a>
-      
-      
-  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/编码/">编码</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-Dll劫持" class="article article-type-post" itemscope itemprop="blogPost">
+        <section id="main"><article id="post-Dll劫持" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/03/01/Dll劫持/" class="article-date">
   <time datetime="2019-03-01T13:00:18.402Z" itemprop="datePublished">2019-03-01</time>
@@ -144,8 +84,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/01/Dll劫持/">最简单的一个DLL劫持(Hijack)</a>
+    <h1 class="article-title" itemprop="name">
+      最简单的一个DLL劫持(Hijack)
     </h1>
   
 
@@ -212,11 +152,23 @@
     </footer>
   </div>
   
-</article>
-
+    
+<nav id="article-nav">
+  
+    <a href="/2019/03/02/Qt编码/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          QT 编码问题
+        
+      </div>
+    </a>
+  
+  
+</nav>
 
   
-
+</article>
 
 </section>
         
